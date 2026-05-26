@@ -22,6 +22,23 @@ enabled = true
 #[[send_email]]
 #name = "email"			#CF发件, 配置后优先使用
 
+# --- begin: account-specific bindings ---
+# These IDs identify resources in the deployer's account. They are not secrets
+# (any action requires a separate API token); declared here so that connecting
+# this repo to Cloudflare Workers Builds (Git auto-deploy) preserves bindings.
+# Fork users: replace the IDs below with their own, or move bindings back to
+# Dashboard if managing them there.
+
+[[d1_databases]]
+binding = "db"
+database_name = "cloud-mail-selfstudio"
+database_id = "9209634f-ff7c-40e1-960e-5bab94f23f7c"
+
+[[kv_namespaces]]
+binding = "kv"
+id = "bfb77743223048caba1b3e8df0a48152"
+# --- end: account-specific bindings ---
+
 [ai]
 binding = "ai"
 
