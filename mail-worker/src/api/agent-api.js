@@ -17,6 +17,11 @@ app.post('/agent/auth/revoke', async (c) => {
 	return c.json(result.ok());
 });
 
+app.delete('/agent/auth/me', async (c) => {
+	const data = await agentService.revokeSelf(c);
+	return c.json(result.ok(data));
+});
+
 app.get('/agent/info', (c) => {
 	return c.json(result.ok(agentService.info(c)));
 });

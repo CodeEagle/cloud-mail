@@ -39,13 +39,37 @@ curl -X POST https://your-domain/api/agent/auth/tokens \
   -d '{"email":"admin@example.com","password":"<admin-password>"}'
 ```
 
-### Revoke a token
+### Revoke a token (admin)
+
+Admin can revoke by either the token's `id` (from `list tokens`) or by the
+raw `token` string — whichever they have on hand.
 
 ```bash
+# by tokenId
 curl -X POST https://your-domain/api/agent/auth/revoke \
   -H 'Content-Type: application/json' \
   -d '{"email":"admin@example.com","password":"<admin-password>","tokenId":"<id>"}'
+
+# by token string (e.g. when someone hands you a leaked token to kill)
+curl -X POST https://your-domain/api/agent/auth/revoke \
+  -H 'Content-Type: application/json' \
+  -d '{"email":"admin@example.com","password":"<admin-password>","token":"<the-leaked-token>"}'
 ```
+
+### Self-revoke (token cancels itself)
+
+No admin credentials needed — the holder of a token can retire it just by
+calling this with the token in the `Authorization` header. Useful for an
+agent that wants to rotate its own credentials after it has minted a
+replacement.
+
+```bash
+curl -X DELETE https://your-domain/api/agent/auth/me \
+  -H 'Authorization: <agent-token>'
+```
+
+After this call, the token is invalidated for both REST and MCP. Subsequent
+requests with it will return HTTP 401.
 
 ## Discovery
 

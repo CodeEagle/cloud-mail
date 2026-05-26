@@ -72,12 +72,26 @@ const agentService = {
 
 	async revokeToken(c, params) {
 		await verifyAdmin(c, params);
-		const { tokenId } = params || {};
-		if (!tokenId) throw new BizError('tokenId required', 400);
+		const { tokenId, token } = params || {};
+		if (!tokenId && !token) throw new BizError('tokenId or token required', 400);
 		const tokens = await loadTokens(c);
-		const next = tokens.filter(item => item.id !== tokenId);
+		const next = tokens.filter(item => {
+			if (tokenId && item.id === tokenId) return false;
+			if (token && item.token === token) return false;
+			return true;
+		});
 		if (next.length === tokens.length) throw new BizError('token not found', 404);
 		await saveTokens(c, next);
+	},
+
+	async revokeSelf(c) {
+		const presented = c.req.header('Authorization');
+		if (!presented) throw new BizError('agent token required', 401);
+		const tokens = await loadTokens(c);
+		const next = tokens.filter(item => item.token !== presented);
+		if (next.length === tokens.length) throw new BizError('token not found', 404);
+		await saveTokens(c, next);
+		return { ok: true };
 	},
 
 	info(c) {
